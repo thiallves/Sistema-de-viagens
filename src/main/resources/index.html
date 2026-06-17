@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema VVV - Demonstração de Testes</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f7;
+      margin: 0;
+      color: #1f2937;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      font-size: 16px;
+    }
+
+    main {
+      width: 95%;
+      max-width: 1300px;
+      margin: 25px auto;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #111827;
+    }
+
+    .botoes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    button {
+      border: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+      background: #2563eb;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .success {
+      background: #16a34a;
+    }
+
+    .success:hover {
+      background: #15803d;
+    }
+
+    .danger {
+      background: #dc2626;
+    }
+
+    .danger:hover {
+      background: #b91c1c;
+    }
+
+    .warning {
+      background: #f59e0b;
+    }
+
+    .warning:hover {
+      background: #d97706;
+    }
+
+    .status-geral {
+      padding: 14px;
+      border-radius: 8px;
+      background: #dbeafe;
+      border-left: 6px solid #2563eb;
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+
+    .progress-container {
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      height: 22px;
+      margin-bottom: 12px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #16a34a;
+      text-align: center;
+      color: white;
+      font-size: 13px;
+      line-height: 22px;
+      transition: width 0.4s;
+    }
+
+    .etapas {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 690px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .etapa {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: center;
+      background: #f9fafb;
+    }
+
+    .etapa:hover {
+      background: #eff6ff;
+    }
+
+    .etapa.aguardando {
+      border-left: 6px solid #94a3b8;
+    }
+
+    .etapa.executando {
+      border-left: 6px solid #f59e0b;
+      background: #fffbeb;
+    }
+
+    .etapa.sucesso {
+      border-left: 6px solid #16a34a;
+      background: #f0fdf4;
+    }
+
+    .etapa.erro {
+      border-left: 6px solid #dc2626;
+      background: #fef2f2;
+    }
+
+    .icone {
+      font-size: 22px;
+      text-align: center;
+    }
+
+    .titulo-etapa {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .descricao-etapa {
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    .metodo {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 3px 6px;
+      border-radius: 5px;
+      background: #e0e7ff;
+      color: #3730a3;
+      margin-top: 5px;
+    }
+
+    .painel-atual {
+      background: #111827;
+      color: #d1fae5;
+      padding: 16px;
+      border-radius: 10px;
+      min-height: 180px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      font-family: Consolas, monospace;
+      font-size: 14px;
+    }
+
+    .resumo {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .resumo-card {
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    .resumo-card strong {
+      display: block;
+      font-size: 26px;
+      margin-bottom: 5px;
+    }
+
+    .ok {
+      color: #16a34a;
+    }
+
+    .erro-texto {
+      color: #dc2626;
+    }
+
+    .info {
+      color: #2563eb;
+    }
+
+    .tabela {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .tabela th,
+    .tabela td {
+      border: 1px solid #e5e7eb;
+      padding: 9px;
+      text-align: left;
+    }
+
+    .tabela th {
+      background: #f3f4f6;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .resumo {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Sistema VVV - Vai & Volta Viagens</h1>
+  <p>Demonstração visual do fluxo da API, regras de negócio e resultados dos testes</p>
+</header>
+
+<main>
+
+  <section class="card">
+    <h2>Etapas do teste</h2>
+
+    <div class="status-geral" id="statusGeral">
+      Aguardando início da demonstração.
+    </div>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="barraProgresso">0%</div>
+    </div>
+
+    <div class="botoes">
+      <button class="success" onclick="executarFluxoCompleto()" id="btnExecutar">
+        Executar fluxo completo
+      </button>
+
+      <button class="danger" onclick="reiniciarTela()">
+        Limpar tela
+      </button>
+    </div>
+
+    <div class="etapas" id="listaEtapas"></div>
+  </section>
+
+  <section class="card">
+    <h2>Resultado da demonstração</h2>
+
+    <div class="resumo">
+      <div class="resumo-card">
+        <strong class="info" id="totalEtapas">0</strong>
+        Etapas
+      </div>
+
+      <div class="resumo-card">
+        <strong class="ok" id="etapasSucesso">0</strong>
+        Concluídas
+      </div>
+
+      <div class="resumo-card">
+        <strong class="erro-texto" id="etapasErro">0</strong>
+        Erros
+      </div>
+
+      <div class="resumo-card">
+        <strong class="info" id="percentual">0%</strong>
+        Progresso
+      </div>
+    </div>
+
+    <h3>Etapa atual / resposta da API</h3>
+    <pre class="painel-atual" id="resultado">Clique em "Executar fluxo completo" para iniciar.</pre>
+
+    <h3>Resumo para apresentação</h3>
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Fluxo</th>
+          <th>O que demonstra</th>
+          <th>Resultado esperado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Reserva + pagamento</td>
+          <td>Cliente reserva uma viagem e confirma com pagamento</td>
+          <td>Reserva CONFIRMADA</td>
+        </tr>
+        <tr>
+          <td>Ticket + bilhete</td>
+          <td>Emissão de passagem após reserva confirmada</td>
+          <td>Ticket EMITIDO e bilhete gerado</td>
+        </tr>
+        <tr>
+          <td>Venda física</td>
+          <td>Venda realizada por funcionário em ponto de venda</td>
+          <td>Status REGISTRADA</td>
+        </tr>
+        <tr>
+          <td>Venda online</td>
+          <td>Venda pela internet pendente de aprovação</td>
+          <td>Status PENDENTE_APROVACAO</td>
+        </tr>
+        <tr>
+          <td>Aprovação online</td>
+          <td>Gerente aprova uma venda online</td>
+          <td>Status APROVADA</td>
+        </tr>
+        <tr>
+          <td>Juros</td>
+          <td>Parcelamento acima de 4 vezes</td>
+          <td>Valor 300 vira 315</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<script>
+  const API = "http://localhost:8080";
+
+  let dados = {};
+  let executando = false;
+
+  const etapas = [
+    {
+      id: "usuario",
+      titulo: "1. Cadastro do usuário cliente",
+      descricao: "Cria um cliente que fará reservas no sistema.",
+      metodo: "POST /usuarios",
+      executar: async () => {
+        dados.usuario = await requisicao("POST", "/usuarios", {
+          nome: "Yngrid",
+          endereco: "Rio de Janeiro",
+          cpf: "12345678900",
+          telefone: "21999999999",
+          profissao: "Estudante",
+          idade: 22,
+          email: "yngrid@email.com",
+          senha: "123456",
+          tipo: "CLIENTE"
+        });
+        return dados.usuario;
+      }
+    },
+    {
+      id: "transportadora",
+      titulo: "2. Cadastro da transportadora",
+      descricao: "Cadastra a empresa responsável pelo transporte.",
+      metodo: "POST /transportadoras",
+      executar: async () => {
+        dados.transportadora = await requisicao("POST", "/transportadoras", {
+          nome: "VVV Transportes",
+          contato: "21988887777"
+        });
+        return dados.transportadora;
+      }
+    },
+    {
+      id: "modal",
+      titulo: "3. Cadastro do modal",
+      descricao: "Cadastra o ônibus e vincula à transportadora.",
+      metodo: "POST /modais",
+      executar: async () => {
+        dados.modal = await requisicao("POST", "/modais", {
+          tipo: "Ônibus",
+          capacidade: 40,
+          status: "DISPONIVEL",
+          modelo: "Executivo",
+          anoFabricacao: 2020,
+          transportadora: {
+            id: dados.transportadora.id
+          }
+        });
+        return dados.modal;
+      }
+    },
+    {
+      id: "viagem",
+      titulo: "4. Cadastro da viagem",
+      descricao: "Cria a viagem Rio de Janeiro → São Paulo.",
+      metodo: "POST /viagens",
+      executar: async () => {
+        dados.viagem = await requisicao("POST", "/viagens", {
+          origem: "Rio de Janeiro",
+          destino: "São Paulo",
+          dataPartida: "2026-06-20T08:00:00",
+          dataChegada: "2026-06-20T14:00:00",
+          modal: {
+            id: dados.modal.id
+          }
+        });
+        return dados.viagem;
+      }
+    },
+    {
+      id: "reserva1",
+      titulo: "5. Criação da reserva principal",
+      descricao: "Cria uma reserva inicialmente com status PENDENTE.",
+      metodo: "POST /reservas",
+      executar: async () => {
+        dados.reserva1 = await requisicao("POST", "/reservas", {
+          valor: 200.00,
+          usuario: {
+            id: dados.usuario.id
+          },
+          viagem: {
+            id: dados.viagem.id
+          }
+        });
+        return dados.reserva1;
+      }
+    },
+    {
+      id: "pagamento1",
+      titulo: "6. Pagamento da reserva",
+      descricao: "Pagamento aprovado confirma automaticamente a reserva.",
+      metodo: "POST /pagamentos",
+      executar: async () => {
+        dados.pagamento1 = await requisicao("POST", "/pagamentos", {
+          metodo: "CREDITO",
+          parcelas: 4,
+          reserva: {
+            id: dados.reserva1.id
+          }
+        });
+        return dados.pagamento1;
+      }
+    },
+    {
+      id: "ticket",
+      titulo: "7. Emissão do ticket",
+      descricao: "Emite ticket somente para reserva confirmada.",
+      metodo: "POST /tickets",
+      executar: async () => {
+        dados.ticket = await requisicao("POST", "/tickets", {
+          tipoPassagem: "RODOVIARIA",
+          reserva: {
+            id: dados.reserva1.id
+          }
+        });
+        return dados.ticket;
+      }
+    },
+    {
+      id: "bilhete",
+      titulo: "8. Geração do bilhete",
+      descricao: "Gera o bilhete com assento e horário de embarque.",
+      metodo: "POST /bilhetes",
+      executar: async () => {
+        dados.bilhete = await requisicao("POST", "/bilhetes", {
+          assento: "12A",
+          ticket: {
+            id: dados.ticket.id
+          }
+        });
+        return dados.bilhete;
+      }
+    },
+    {
+      id: "pontoVenda",
+      titulo: "9. Cadastro do ponto de venda",
+      descricao: "Cria o ponto físico onde um funcionário poderá vender.",
+      metodo: "POST /pontovendas",
+      executar: async () => {
+        dados.pontoVenda = await requisicao("POST", "/pontovendas", {
+          nome: "Ponto de Venda Central",
+          cnpj: "12345678000199",
+          endereco: "Av. Presidente Vargas, 2000",
+          telefone: "2130000000"
+        });
+        return dados.pontoVenda;
+      }
+    },
+    {
+      id: "funcionario",
+      titulo: "10. Cadastro do funcionário",
+      descricao: "Funcionário fica vinculado ao ponto de venda.",
+      metodo: "POST /funcionarios",
+      executar: async () => {
+        dados.funcionario = await requisicao("POST", "/funcionarios", {
+          nome: "Funcionario Teste",
+          endereco: "Rio de Janeiro",
+          cpf: "44444444444",
+          telefone: "21955555555",
+          profissao: "Vendedor",
+          idade: 30,
+          email: "funcionario@email.com",
+          senha: "123456",
+          cargo: "PADRAO",
+          pontoVenda: {
+            id: dados.pontoVenda.id
+          }
+        });
+        return dados.funcionario;
+      }
+    },
+    {
+      id: "reservaFisica",
+      titulo: "11. Reserva para venda física",
+      descricao: "Cria uma nova reserva para registrar uma venda presencial.",
+      metodo: "POST /reservas",
+      executar: async () => {
+        dados.reservaFisica = await requisicao("POST", "/reservas", {
+          valor: 250.00,
+          usuario: {
+            id: dados.usuario.id
+          },
+          viagem: {
+            id: dados.viagem.id
+          }
+        });
+        return dados.reservaFisica;
+      }
+    },
+    {
+      id: "pagamentoFisico",
+      titulo: "12. Pagamento da venda física",
+      descricao: "Confirma a reserva que será usada na venda física.",
+      metodo: "POST /pagamentos",
+      executar: async () => {
+        dados.pagamentoFisico = await requisicao("POST", "/pagamentos", {
+          metodo: "CREDITO",
+          parcelas: 3,
+          reserva: {
+            id: dados.reservaFisica.id
+          }
+        });
+        return dados.pagamentoFisico;
+      }
+    },
+    {
+      id: "vendaFisica",
+      titulo: "13. Registro da venda física",
+      descricao: "Venda física precisa estar vinculada a um funcionário.",
+      metodo: "POST /vendas",
+      executar: async () => {
+        dados.vendaFisica = await requisicao("POST", "/vendas", {
+          tipo: "FISICA",
+          reserva: {
+            id: dados.reservaFisica.id
+          },
+          funcionario: {
+            id: dados.funcionario.id
+          }
+        });
+        return dados.vendaFisica;
+      }
+    },
+    {
+      id: "reservaOnline",
+      titulo: "14. Reserva para venda online",
+      descricao: "Cria uma reserva para o fluxo de venda pela internet.",
+      metodo: "POST /reservas",
+      executar: async () => {
+        dados.reservaOnline = await requisicao("POST", "/reservas", {
+          valor: 300.00,
+          usuario: {
+            id: dados.usuario.id
+          },
+          viagem: {
+            id: dados.viagem.id
+          }
+        });
+        return dados.reservaOnline;
+      }
+    },
+    {
+      id: "pagamentoOnline",
+      titulo: "15. Pagamento online com juros",
+      descricao: "Regra de negócio: acima de 4 parcelas aplica 5% de juros.",
+      metodo: "POST /pagamentos",
+      executar: async () => {
+        dados.pagamentoOnline = await requisicao("POST", "/pagamentos", {
+          metodo: "CREDITO",
+          parcelas: 5,
+          reserva: {
+            id: dados.reservaOnline.id
+          }
+        });
+        return dados.pagamentoOnline;
+      }
+    },
+    {
+      id: "vendaOnline",
+      titulo: "16. Registro da venda online",
+      descricao: "Venda online fica pendente de aprovação do gerente.",
+      metodo: "POST /vendas",
+      executar: async () => {
+        dados.vendaOnline = await requisicao("POST", "/vendas", {
+          tipo: "ONLINE",
+          reserva: {
+            id: dados.reservaOnline.id
+          }
+        });
+        return dados.vendaOnline;
+      }
+    },
+    {
+      id: "gerente",
+      titulo: "17. Cadastro do gerente",
+      descricao: "Cria um gerente com permissão para aprovar venda online.",
+      metodo: "POST /usuarios",
+      executar: async () => {
+        dados.gerente = await requisicao("POST", "/usuarios", {
+          nome: "Gerente Online",
+          endereco: "Rio de Janeiro",
+          cpf: "33333333333",
+          telefone: "21966666666",
+          profissao: "Gerente",
+          idade: 35,
+          email: "gerente@email.com",
+          senha: "123456",
+          tipo: "GERENTE_VENDAS_ONLINE"
+        });
+        return dados.gerente;
+      }
+    },
+    {
+      id: "aprovarVenda",
+      titulo: "18. Aprovação da venda online",
+      descricao: "Gerente aprova a venda online pendente.",
+      metodo: "PUT /vendas/{id}/aprovar",
+      executar: async () => {
+        dados.vendaAprovada = await requisicao(
+          "PUT",
+          "/vendas/" + dados.vendaOnline.id + "/aprovar?usuarioId=" + dados.gerente.id
+        );
+        return dados.vendaAprovada;
+      }
+    },
+    {
+      id: "resultadoVendas",
+      titulo: "19. Consulta final de vendas",
+      descricao: "Mostra venda física REGISTRADA e venda online APROVADA.",
+      metodo: "GET /vendas",
+      executar: async () => {
+        dados.vendas = await requisicao("GET", "/vendas");
+        return dados.vendas;
+      }
+    },
+    {
+      id: "resultadoReservas",
+      titulo: "20. Consulta final de reservas",
+      descricao: "Mostra as reservas geradas no fluxo.",
+      metodo: "GET /reservas",
+      executar: async () => {
+        dados.reservas = await requisicao("GET", "/reservas");
+        return dados.reservas;
+      }
+    },
+    {
+      id: "resultadoPagamentos",
+      titulo: "21. Consulta final de pagamentos",
+      descricao: "Mostra pagamentos aprovados e o valor com juros.",
+      metodo: "GET /pagamentos",
+      executar: async () => {
+        dados.pagamentos = await requisicao("GET", "/pagamentos");
+        return dados.pagamentos;
+      }
+    },
+    {
+      id: "resultadoBilhetes",
+      titulo: "22. Consulta final de bilhetes",
+      descricao: "Mostra o bilhete emitido no fluxo principal.",
+      metodo: "GET /bilhetes",
+      executar: async () => {
+        dados.bilhetes = await requisicao("GET", "/bilhetes");
+        return dados.bilhetes;
+      }
+    }
+  ];
+
+  function montarEtapas() {
+    const lista = document.getElementById("listaEtapas");
+    lista.innerHTML = "";
+
+    etapas.forEach((etapa, index) => {
+      const div = document.createElement("div");
+      div.className = "etapa aguardando";
+      div.id = "etapa-" + etapa.id;
+      div.onclick = () => mostrarDetalheEtapa(etapa);
+
+      div.innerHTML = `
+        <div class="icone" id="icone-${etapa.id}">⏳</div>
+        <div>
+          <div class="titulo-etapa">${etapa.titulo}</div>
+          <div class="descricao-etapa">${etapa.descricao}</div>
+          <span class="metodo">${etapa.metodo}</span>
+        </div>
+      `;
+
+      lista.appendChild(div);
+    });
+
+    atualizarResumo();
+  }
+
+  function mostrarDetalheEtapa(etapa) {
+    const saida = document.getElementById("resultado");
+    const resultado = etapa.resultado
+      ? JSON.stringify(etapa.resultado, null, 2)
+      : "Esta etapa ainda não foi executada.";
+
+    saida.textContent =
+`ETAPA: ${etapa.titulo}
+
+DESCRIÇÃO:
+${etapa.descricao}
+
+ENDPOINT:
+${etapa.metodo}
+
+RESULTADO:
+${resultado}`;
+  }
+
+  function atualizarEtapa(id, status, resultado = null) {
+    const div = document.getElementById("etapa-" + id);
+    const icone = document.getElementById("icone-" + id);
+
+    div.className = "etapa " + status;
+
+    if (status === "aguardando") icone.textContent = "⏳";
+    if (status === "executando") icone.textContent = "🔄";
+    if (status === "sucesso") icone.textContent = "✅";
+    if (status === "erro") icone.textContent = "❌";
+
+    const etapa = etapas.find(e => e.id === id);
+    if (etapa && resultado !== null) {
+      etapa.resultado = resultado;
+    }
+
+    atualizarResumo();
+  }
+
+  function atualizarResumo() {
+    const sucesso = etapas.filter(e => {
+      const div = document.getElementById("etapa-" + e.id);
+      return div && div.classList.contains("sucesso");
+    }).length;
+
+    const erro = etapas.filter(e => {
+      const div = document.getElementById("etapa-" + e.id);
+      return div && div.classList.contains("erro");
+    }).length;
+
+    const total = etapas.length;
+    const porcentagem = Math.round((sucesso / total) * 100);
+
+    document.getElementById("totalEtapas").textContent = total;
+    document.getElementById("etapasSucesso").textContent = sucesso;
+    document.getElementById("etapasErro").textContent = erro;
+    document.getElementById("percentual").textContent = porcentagem + "%";
+
+    const barra = document.getElementById("barraProgresso");
+    barra.style.width = porcentagem + "%";
+    barra.textContent = porcentagem + "%";
+  }
+
+  function atualizarStatus(texto) {
+    document.getElementById("statusGeral").textContent = texto;
+  }
+
+  function mostrarResultado(titulo, dadosResultado) {
+    document.getElementById("resultado").textContent =
+`${titulo}
+
+${JSON.stringify(dadosResultado, null, 2)}`;
+  }
+
+  async function requisicao(metodo, endpoint, body = null) {
+    const config = {
+      method: metodo,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+
+    if (body) {
+      config.body = JSON.stringify(body);
+    }
+
+    const resposta = await fetch(API + endpoint, config);
+
+    if (!resposta.ok) {
+      const textoErro = await resposta.text();
+      throw new Error(textoErro);
+    }
+
+    if (resposta.status === 204) {
+      return {};
+    }
+
+    return await resposta.json();
+  }
+
+  function esperar(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function executarFluxoCompleto() {
+    if (executando) return;
+
+    executando = true;
+    dados = {};
+    document.getElementById("btnExecutar").disabled = true;
+
+    etapas.forEach(e => {
+      e.resultado = null;
+      atualizarEtapa(e.id, "aguardando");
+    });
+
+    atualizarStatus("Executando demonstração do sistema...");
+    mostrarResultado("INÍCIO DA DEMONSTRAÇÃO", {
+      mensagem: "O sistema começará a executar todas as etapas do fluxo principal."
+    });
+
+    for (const etapa of etapas) {
+      try {
+        atualizarStatus("Executando: " + etapa.titulo);
+        atualizarEtapa(etapa.id, "executando");
+
+        mostrarResultado("EXECUTANDO " + etapa.titulo, {
+          descricao: etapa.descricao,
+          endpoint: etapa.metodo
+        });
+
+        await esperar(700);
+
+        const resultado = await etapa.executar();
+
+        atualizarEtapa(etapa.id, "sucesso", resultado);
+        mostrarResultado("CONCLUÍDO " + etapa.titulo, resultado);
+
+        await esperar(500);
+
+      } catch (erro) {
+        atualizarEtapa(etapa.id, "erro", erro.message);
+
+        mostrarResultado("ERRO NA ETAPA " + etapa.titulo, {
+          endpoint: etapa.metodo,
+          erro: erro.message
+        });
+
+        atualizarStatus("Erro na etapa: " + etapa.titulo);
+        executando = false;
+        document.getElementById("btnExecutar").disabled = false;
+        return;
+      }
+    }
+
+    atualizarStatus("Demonstração finalizada com sucesso!");
+    mostrarResultado("FLUXO COMPLETO FINALIZADO COM SUCESSO", {
+      mensagem: "Todas as etapas foram executadas sem erro.",
+      etapasExecutadas: etapas.length,
+      resultado: "Sistema funcionando corretamente."
+    });
+
+    executando = false;
+    document.getElementById("btnExecutar").disabled = false;
+  }
+
+  function reiniciarTela() {
+    if (executando) return;
+
+    dados = {};
+    etapas.forEach(e => {
+      e.resultado = null;
+    });
+
+    montarEtapas();
+
+    document.getElementById("resultado").textContent =
+      "Clique em \"Executar fluxo completo\" para iniciar.";
+
+    atualizarStatus("Aguardando início da demonstração.");
+  }
+
+  montarEtapas();
+</script>
+
+</body>
+</html>
